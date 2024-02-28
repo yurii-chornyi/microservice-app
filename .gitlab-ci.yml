@@ -5,6 +5,9 @@ variables:
   DOCKER_DRIVER: overlay2
 
 before_script:
+  - export DOCKER_CLI_ACI=1
+  - export DOCKER_CONTENT_TRUST=0
+  - apk add --update docker
   - docker info
 
 build_frontend:
