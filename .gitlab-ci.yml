@@ -1,6 +1,5 @@
 stages:
   - build
-image: docker:latest
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -11,4 +10,4 @@ build_frontend:
   stage: build
   script:
     - cd frontend
-    - docker build -t some .
+    - docker ps
