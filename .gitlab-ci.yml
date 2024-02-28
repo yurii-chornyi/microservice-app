@@ -2,14 +2,14 @@ stages:
   - build
 
 variables:
-  # Задайте змінні, якщо потрібно
+  DOCKER_DRIVER: overlay2
 
 before_script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker info
 
 build_frontend:
   stage: build
   script:
     - cd frontend
-    - docker build -t newimage/frontend:tag1 .
-    
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_NAME .
+    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_NAME
