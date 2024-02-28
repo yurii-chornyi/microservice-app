@@ -1,5 +1,6 @@
 stages:
   - build
+image: docker:latest
 
 variables:
   DOCKER_DRIVER: overlay2
