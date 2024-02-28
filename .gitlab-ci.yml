@@ -11,5 +11,5 @@ build_frontend:
   stage: build
   script:
     - cd frontend
-    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_NAME .
-    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_NAME
+    - docker build -t newimage/frontend:tag1 .
+    
