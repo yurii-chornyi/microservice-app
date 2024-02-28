@@ -10,5 +10,4 @@ build_frontend:
   stage: build
   script:
     - cd frontend
-    - ls
-    - cat Dockerfile
+    - docker build -t some .
