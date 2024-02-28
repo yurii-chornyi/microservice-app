@@ -7,8 +7,8 @@ variables:
 before_script:
   - export DOCKER_CLI_ACI=1
   - export DOCKER_CONTENT_TRUST=0
-  - apk update
-  - apk add docker
+  - apt-get update -qy
+  - apt-get install -y docker.io
   - docker info
 
 build_frontend:
