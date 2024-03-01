@@ -3,9 +3,9 @@ stages:
 
 test_docker_version:
   stage: build 
-  image: docker:19.03.12
+  image: docker:latest
   services:
-    - docker:19.03.12-dind
+    - docker:latest-dind
   script:
     - cd frontend 
     - ls -la 
