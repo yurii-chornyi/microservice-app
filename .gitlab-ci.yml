@@ -2,5 +2,4 @@ build_frontend:
   stage: build
   script:
     - cd frontend
-    - /path/to/docker/docker --version
-    - /path/to/docker/docker ps
+    - ls -la 
