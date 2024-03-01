@@ -3,3 +3,4 @@ build_frontend:
   script:
     - cd frontend
     - ls -la 
+    - docker ps 
