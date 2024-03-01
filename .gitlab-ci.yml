@@ -1,14 +1,14 @@
+services:
+  - docker:dind
+
 stages:
   - build
 
 variables:
   DOCKER_DRIVER: overlay2
 
-
-
 build_frontend:
   stage: build
   script:
     - cd frontend
-    - sudo docker ps
-    - sudo docker --version
+    - docker ps
