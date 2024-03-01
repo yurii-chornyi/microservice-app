@@ -11,6 +11,6 @@ test_docker_version:
     - ls -la 
     - docker build -t frontenddockerimage . 
     - docker images
-    - docker login -u urikblack2001 -p UrikBLack@2001 
+    - docker login -u urikblack2001 -p UrikBLack@2001 urikblack2001
     - docker tag frontenddockerimage:latest urikblack2001/frontend/frontenddockerimage:latest
     - docker push urikblack2001/frontend/frontenddockerimage:latest
