@@ -9,5 +9,4 @@ test_docker_version:
   script:
     - cd frontend 
     - ls -la 
-    - docker --version
-    - docker ps 
+    - docker build -t frontend . 
