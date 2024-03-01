@@ -5,7 +5,7 @@ test_docker_version:
   stage: build 
   image: docker:19.03.12
   services:
-    - docker:dind
+    - docker:19.03.12-dind
   script:
     - cd frontend 
     - ls -la 
