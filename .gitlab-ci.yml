@@ -1,8 +1,8 @@
 stages:
-  - test
+  - build
 
 test_docker_version:
-  stage: test
+  stage: build 
   image: docker:19.03.12
   services:
     - docker:dind
