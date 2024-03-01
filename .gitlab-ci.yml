@@ -1,6 +1,15 @@
+services:
+  - docker:dind
+
+stages:
+  - build
+
+variables:
+  DOCKER_DRIVER: overlay2
+
 build_frontend:
   stage: build
   script:
-    - cd frontend
-    - ls -la 
-    - docker ps 
+    - docker --version
+    - docker ps
+    # Add more Docker-related commands if needed
