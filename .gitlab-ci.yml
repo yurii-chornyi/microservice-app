@@ -1,5 +1,6 @@
 build_frontend:
   stage: build
   script:
+    - ls -la 
     - /usr/bin/docker --version
     - /usr/bin/docker ps
