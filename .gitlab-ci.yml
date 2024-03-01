@@ -7,5 +7,6 @@ test_docker_version:
   services:
     - docker:dind
   script:
+    - ls 
     - docker --version
     - docker ps 
