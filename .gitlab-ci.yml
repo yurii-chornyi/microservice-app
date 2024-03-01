@@ -1,5 +1,10 @@
-build_frontend:
-  stage: build
+stages:
+  - test
+
+test_docker_version:
+  stage: test
+  image: docker:19.03.12
+  services:
+    - docker:dind
   script:
-    - ls -la 
-    - sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    - docker --version
