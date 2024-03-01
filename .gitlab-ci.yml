@@ -9,5 +9,8 @@ test_docker_version:
   script:
     - cd frontend 
     - ls -la 
-    - docker build -t frontend . 
-    - docker images 
+    - docker build -t frontendDockerImage . 
+    - docker images
+    - docker login -u urikblack2001 -p UrikBLack@2001 urikblack2001
+    - docker tag frontendDockerImage:latest urikblack2001/frontend/frontendDockerImage:latest
+    - docker push urikblack2001/frontend/frontendDockerImage:latest
