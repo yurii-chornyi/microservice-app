@@ -12,7 +12,10 @@ RUN chmod +x mvnw
 # Run maven dependency resolution
 RUN ./mvnw dependency:resolve
 
+# Copy the project files into the image
 COPY . .
+
+# Run Maven install
 RUN ./mvnw install
 
 CMD ["java", "-jar", "./target/users-api-0.0.1-SNAPSHOT.jar"]
