@@ -20,8 +20,8 @@ RUN ./mvnw dependency:resolve
 # Copy the project files into the image
 COPY . .
 
-# Run Maven install using sh shell
-RUN sh -c './mvnw install'
+# Run Maven install directly without the wrapper script
+RUN mvn install
 
 # Define the command to run the application when the container starts
 CMD ["java", "-jar", "./target/users-api-0.0.1-SNAPSHOT.jar"]
