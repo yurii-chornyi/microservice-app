@@ -43,10 +43,10 @@ todos-build:
         FILE_PATH: "todos-api"
         VERSION: "latest"
 
-users-api-build:
+auth-build:
     stage: build
     extends: .cicd_template
     variables:
-        IMAGE_NAME: "users-img"
-        FILE_PATH: "users-api"
+        IMAGE_NAME: "auth-img"
+        FILE_PATH: "auth-api"
         VERSION: "latest"
