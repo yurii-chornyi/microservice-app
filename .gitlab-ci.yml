@@ -42,3 +42,11 @@ todos-build:
         IMAGE_NAME: "todos-img"
         FILE_PATH: "todos-api"
         VERSION: "latest"
+
+users-api-build:
+    stage: build
+    extends: .lurbaby_template
+    variables:
+        IMAGE_NAME: "users-img"
+        FILE_PATH: "users-api"
+        VERSION: "latest"
