@@ -1,17 +1,21 @@
-# .gitlab-ci.yml
+stages:
+ - build
 
-# Frontend build
-front-build:
-  stage: build
-  image: docker:19.03.12
-  services:
-    - docker:19.03.12-dind
-  script:
-    - echo "Building frontend image"
-    - cd frontend || exit 1 # переконайтеся, що ви належним чином переходите до каталогу frontend
-    - docker build -t $CI_REGISTRY_IMAGE/frontend-img:latest .
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
-    - docker push $CI_REGISTRY_IMAGE/frontend-img:latest
-  only:
-    changes:
-      - frontend/**/*  # Запускається лише при змінах у директорії frontend
+
+test_docker_version:
+ stage: build
+ image: docker:latest
+ services:
+   - docker:latest-dind
+ script:
+   - cd frontend
+   - ls -la
+   - docker build -t frontenddockerimage .
+   - docker images
+   - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+   - docker tag frontenddockerimage:latest $CI_REGISTRY_IMAGE/frontend/frontenddockerimage:latest
+   - docker push $CI_REGISTRY_IMAGE/frontend/frontenddockerimage:latest
+
+
+
+
