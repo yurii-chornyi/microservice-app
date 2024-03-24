@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 COPY pom.xml mvnw ./
 COPY .mvn/ ./.mvn
-RUN chmod +x mvnw
+RUN chmod 777 mvnw
 RUN ./mvnw dependency:resolve
 
 COPY . .
