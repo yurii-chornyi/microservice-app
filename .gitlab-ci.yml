@@ -25,3 +25,12 @@ front-build:
         IMAGE_NAME: "frontend-img"
         FILE_PATH: "frontend"
         VERSION: "latest"
+
+
+log-msg-proc-build:
+    stage: build
+    extends: .cicd_template
+    variables:
+        IMAGE_NAME: "log-img"
+        FILE_PATH: "log-message-processor"
+        VERSION: "latest"
