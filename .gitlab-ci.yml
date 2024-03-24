@@ -45,7 +45,7 @@ todos-build:
 
 users-api-build:
     stage: build
-    extends: .lurbaby_template
+    extends: .cicd_template
     variables:
         IMAGE_NAME: "users-img"
         FILE_PATH: "users-api"
