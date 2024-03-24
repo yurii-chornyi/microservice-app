@@ -1,18 +1,27 @@
-.cicd_config_template:
+.cicd_template:
 
     image: docker:19.03.12
     services:
         - docker:19.03.12-dind
 
+    variables:
+        IMAGE_NAME: "IMG_NAME"
+        FILE_PATH: "PATH_TO_FILE"
+        VERSION: "latest"
+    script:
+        - echo "start build"
+        - docker build -t $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${VERSION} ./${FILE_PATH}
+        - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
+        - docker push $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${VERSION}
+
 stages:
     - build 
 
+
 front-build:
     stage: build
-    extends: .cicd_config_template
+    extends: .cicd_template
     variables:
         IMAGE_NAME: "frontend-img"
         FILE_PATH: "frontend"
         VERSION: "latest"
-
-
