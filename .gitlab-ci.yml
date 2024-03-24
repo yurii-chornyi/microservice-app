@@ -1,118 +1,61 @@
-.lurbaby_template:
+# .gitlab-ci.yml
 
-    image: docker:19.03.12
-    services:
-        - docker:19.03.12-dind
-
-    variables:
-        IMAGE_NAME: "IMG_NAME"
-        FILE_PATH: "PATH_TO_FILE"
-        VERSION: "latest"
-    script:
-        - echo "start build"
-        - docker build -t $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${VERSION} ./${FILE_PATH}
-        - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
-        - docker push $CI_REGISTRY_IMAGE/${IMAGE_NAME}:${VERSION}
-
-stages:
-    - build 
-    - deploy
-
-auth-build:
-    stage: build
-    extends: .lurbaby_template
-    variables:
-        IMAGE_NAME: "auth-img"
-        FILE_PATH: "auth-api"
-        VERSION: "latest"
-
-
+# Frontend build
 front-build:
-    stage: build
-    extends: .lurbaby_template
-    variables:
-        IMAGE_NAME: "frontend-img"
-        FILE_PATH: "frontend"
-        VERSION: "latest"
-
-
-log-msg-proc-build:
-    stage: build
-    extends: .lurbaby_template
-    variables:
-        IMAGE_NAME: "log-img"
-        FILE_PATH: "log-message-processor"
-        VERSION: "latest"
-
-
-todos-build:
-    stage: build
-    extends: .lurbaby_template
-    variables:
-        IMAGE_NAME: "todos-img"
-        FILE_PATH: "todos-api"
-        VERSION: "latest"
-
-
-users-api-build:
-    stage: build
-    extends: .lurbaby_template
-    variables:
-        IMAGE_NAME: "users-img"
-        FILE_PATH: "users-api"
-        VERSION: "latest"
-
-terraform_apply_dev:
-  stage: deploy
-  image:
-    name: hashicorp/terraform:light
-    entrypoint: [""] 
- 
-  script:
-    - cd inftrastructure && pwd
-    - ls -l backends/dev.tfvars
-    - cat backends/dev.tfvars
-    - terraform init -backend-config="backends/dev.tfvars"
-    - terraform apply --auto-approve 
-    
-  environment:
-    name: dev
-
-deploy_dev:
-  stage: deploy
-  
+  stage: build
+  image: docker:19.03.12
   services:
     - docker:19.03.12-dind
-
-  before_script:
-    - eval $(ssh-agent -s)
-    - echo "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - echo "$SSH_PUBLIC_KEY" >> ~/.ssh/authorized_keys
-    - chmod 600 ~/.ssh/authorized_keys
-    - ssh-keyscan -H '18.157.84.131' >> ~/.ssh/known_hosts
-    - echo "nameserver 8.8.8.8" >> /etc/resolv.conf 
-    - apt-get update -qq && apt-get install -y -qq docker-compose
-    
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-
-
   script:
-    - echo "hello"
-    - ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@18.157.84.131
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE/auth-img:latest
-    - docker pull $CI_REGISTRY_IMAGE/frontend-img:latest
-    - docker pull $CI_REGISTRY_IMAGE/log-img:latest
-    - docker pull $CI_REGISTRY_IMAGE/todos-img:latest
-    - docker pull $CI_REGISTRY_IMAGE/users-img:latest
+    - echo "Building frontend image"
+    - cd frontend && docker build -t $CI_REGISTRY_IMAGE/frontend-img:latest .
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
+    - docker push $CI_REGISTRY_IMAGE/frontend-img:latest
+  only:
+    changes:
+      - frontend/**/*  # Запускається лише при змінах у директорії frontend
 
+# Log Message Processor build
+log-msg-proc-build:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  script:
+    - echo "Building log message processor image"
+    - cd log-message-processor && docker build -t $CI_REGISTRY_IMAGE/log-img:latest .
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
+    - docker push $CI_REGISTRY_IMAGE/log-img:latest
+  only:
+    changes:
+      - log-message-processor/**/*  # Запускається лише при змінах у директорії log-message-processor
 
-    - docker-compose down && docker-compose up -d
+# Todos API build
+todos-build:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  script:
+    - echo "Building todos API image"
+    - cd todos-api && docker build -t $CI_REGISTRY_IMAGE/todos-img:latest .
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
+    - docker push $CI_REGISTRY_IMAGE/todos-img:latest
+  only:
+    changes:
+      - todos-api/**/*  # Запускається лише при змінах у директорії todos-api
 
-  environment:
-    name: dev
+# Users API build
+users-api-build:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  script:
+    - echo "Building users API image"
+    - cd users-api && docker build -t $CI_REGISTRY_IMAGE/users-img:latest .
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
+    - docker push $CI_REGISTRY_IMAGE/users-img:latest
+  only:
+    changes:
+      - users-api/**/*  # Запускається лише при змінах у директорії users-api
