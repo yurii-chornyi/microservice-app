@@ -1,4 +1,4 @@
-.lurbaby_template:
+.lurvfvfdvdbaby_template:
 
     image: docker:19.03.12
     services:
@@ -19,7 +19,7 @@ stages:
 
 front-build:
     stage: build
-    extends: .lurbaby_template
+    extends: .lurvfvfdvdbaby_template
     variables:
         IMAGE_NAME: "frontend-img"
         FILE_PATH: "frontend"
