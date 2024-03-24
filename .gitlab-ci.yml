@@ -8,7 +8,8 @@ front-build:
     - docker:19.03.12-dind
   script:
     - echo "Building frontend image"
-    - cd frontend && docker build -t $CI_REGISTRY_IMAGE/frontend-img:latest .
+    - cd frontend || exit 1 # переконайтеся, що ви належним чином переходите до каталогу frontend
+    - docker build -t $CI_REGISTRY_IMAGE/frontend-img:latest .
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
     - docker push $CI_REGISTRY_IMAGE/frontend-img:latest
   only:
@@ -23,7 +24,8 @@ log-msg-proc-build:
     - docker:19.03.12-dind
   script:
     - echo "Building log message processor image"
-    - cd log-message-processor && docker build -t $CI_REGISTRY_IMAGE/log-img:latest .
+    - cd log-message-processor || exit 1 # переконайтеся, що ви належним чином переходите до каталогу log-message-processor
+    - docker build -t $CI_REGISTRY_IMAGE/log-img:latest .
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
     - docker push $CI_REGISTRY_IMAGE/log-img:latest
   only:
@@ -38,7 +40,8 @@ todos-build:
     - docker:19.03.12-dind
   script:
     - echo "Building todos API image"
-    - cd todos-api && docker build -t $CI_REGISTRY_IMAGE/todos-img:latest .
+    - cd todos-api || exit 1 # переконайтеся, що ви належним чином переходите до каталогу todos-api
+    - docker build -t $CI_REGISTRY_IMAGE/todos-img:latest .
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
     - docker push $CI_REGISTRY_IMAGE/todos-img:latest
   only:
@@ -53,7 +56,8 @@ users-api-build:
     - docker:19.03.12-dind
   script:
     - echo "Building users API image"
-    - cd users-api && docker build -t $CI_REGISTRY_IMAGE/users-img:latest .
+    - cd users-api || exit 1 # переконайтеся, що ви належним чином переходите до каталогу users-api
+    - docker build -t $CI_REGISTRY_IMAGE/users-img:latest .
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
     - docker push $CI_REGISTRY_IMAGE/users-img:latest
   only:
