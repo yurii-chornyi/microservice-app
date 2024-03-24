@@ -50,3 +50,12 @@ auth-build:
         IMAGE_NAME: "auth-img"
         FILE_PATH: "auth-api"
         VERSION: "latest"
+
+
+users-api-build:
+    stage: build
+    extends: .cicd_template
+    variables:
+        IMAGE_NAME: "users-img"
+        FILE_PATH: "users-api"
+        VERSION: "latest"
