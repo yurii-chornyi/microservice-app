@@ -1,6 +1,9 @@
 # Use the official OpenJDK 8 Alpine image as the base image
 FROM openjdk:8-alpine
 
+# Install Maven
+RUN apk add --no-cache maven
+
 # Expose port 8083 (adjust as needed)
 EXPOSE 8083
 
