@@ -34,3 +34,11 @@ log-msg-proc-build:
         IMAGE_NAME: "log-img"
         FILE_PATH: "log-message-processor"
         VERSION: "latest"
+
+todos-build:
+    stage: build
+    extends: .lurbaby_template
+    variables:
+        IMAGE_NAME: "todos-img"
+        FILE_PATH: "todos-api"
+        VERSION: "latest"
