@@ -1,0 +1,64 @@
+variables:
+  SSH_EC2: ssh -i microservice-app-key.pem ubuntu@$SERVER_IP #Ця змінна використовується для передачі команд на сервер через ssh
+  CI_REGISTRY_IMAGE: registry.gitlab.com/dev-ops-dosvit/microservice-app
+
+image:
+    name: hashicorp/terraform:light #Використовуємо полегшену версію образу з встановленим terraform
+    entrypoint: [""]
+
+stages:
+  - apply
+  - deploy
+    
+before_script:
+  - cd ${CI_PROJECT_DIR}/infrastructure #Перехід у каталог з кодом Terraform
+  - terraform --version #НЕ ОБОВ'ЯЗКОВО. Команда для перевірки наявності встановленого terrafrom. 
+  - terraform init -backend-config=backend/dev.auto.tfvars #-backend-config="./backend/dev.auto.tfvars" #Викосритстання параметру backend config вказує ім'я файлу tfstate, який збережно на s3 bucket
+  - terraform fmt #НЕ ОБОВ'ЯЗКОВО. Форматування коду terrafrom для кращого сприйняття.
+
+terraform_apply_job:
+  stage: apply
+  only: 
+    - studing #цей парметр вказує, що завдання буде виконуватися лише при комміті на гілку studing
+  
+  script:
+    - terraform plan
+    - terraform apply -auto-approve #Використання аргументу -auto-approve дозволяє виконати команду без інтерактивного підтвердження
+  environment:
+    name: dev #Ім'я середовища, в якому виконується job
+    url: https://microservice-app.dev.com #Посилання на середовище
+
+deploy_dev:
+  stage: deploy
+  only: #Параметр, що вказує гілки, при комміті на які буде виконано job
+    - studing 
+  before_script:
+    - mkdir -p ~/.ssh #Створення каталогу .ssh для зберігання SSH ключів. Аргумент -р вказує, що необхідно створити всі батьківські каталоги для вказаного.
+    - echo '$SSH_PRIVATE_KEY' > ~/.ssh/id_rsa #Запис значення змінної, що містить приватний ключ у файл id_rsa для можливості підключення через SSH. Змінна $SSH_PRIVATE_KEY містить приватний SSH ключ та збережена у середовищі GitLab.
+    - chmod 600 ~/.ssh/id_rsa #Призначення прав доступу лише на читання та запис власнимком файлу ключів id_rsa.
+    - chmod 600 microservice-app-key.pem #Визначення прав лише на читання власником для файлу персонального ключа SSH.
+    - ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts #Команда сканує ключ хоста дял сервера $SERVER_IP (змінна середовища GitLab, яка містить IP адресу серверу). Отримане значення додається у кінець файлу known_hosts за допомогою оператора >>.
+      #- echo "{\"auths\":{\"registry.gitlab.com\":{\"username\":\"$DOCKER_USERNAME\",\"password\":\"$DOCKER_PASSWORD\"}}}" > ~/docker_config.json #Передача даних авторизації у фйл конфігруації docker
+      #- scp ~/docker_config.json -i microservice-app-key.pem ubuntu@$SERVER_IP:~/docker_config.json #Передача кнфігурації Docker на віддалений сервер
+    - ssh -i microservice-app-key.pem ubuntu@$SERVER_IP #Підключення до серверу для підтвердження можливості з'єднання.
+  script: #Використання змінної SSH_EC2 дозволяє зробити код більш організованим. При виконанні кожної команди GitLab необхідно надсилати запит на х'єднання SSH до серверу
+    - $SSH_EC2 'sudo docker version' #НЕ ОБОВ'ЯЗКОВО. Команда дозволяє перевірити правильність встановленя та роботи Docker на сервері.
+    - $SSH_EC2 'echo $DOCKER_USERNAME'
+    - $SSH_EC2 'echo -n '$DOCKER_PASSWORD' | sudo docker login --username '$DOCKER_USERNAME' --password-stdin registry.gitlab.com' #Ця команда виводить значення змінної $DOCKER_PASSWORD (змінна визначена у середовищі GitLab та містить токен доступу до репозиторію GitLab. Використання паролю не допускається при ввімкненій MFA) та передає її через пайп у команду docker-login. Команда використовує аргумент --username для отримання значення мені користувача зі змінної $DOCKER_USERNAME (змінна визначена у середовищі GitLab). Аргумент --password-stdin вказує на отримання значення з потоку введення, що у данному випадку є результатом команди echo. registry.gitlab.com - це реєстр образів GitLab. 
+    - $SSH_EC2 'sudo docker compose -f ~/docker-compose.yaml config' #Вказується файл конфігурації для docker compose. Файл був попередньо завантажений на сервер
+    #- $SSH_EC2 'sudo docker pull '$CI_REGISTRY_IMAGE'/users-api:latest'
+    #- $SSH_EC2 'sudo docker pull '$CI_REGISTRY_IMAGE'/todos-api:latest'
+    #- $SSH_EC2 'sudo docker pull '$CI_REGISTRY_IMAGE'/log-message-processor:latest'
+    #- $SSH_EC2 'sudo docker pull '$CI_REGISTRY_IMAGE'/frontend:latest'
+    #- $SSH_EC2 'sudo docker pull '$CI_REGISTRY_IMAGE'/auth-api:latest'
+    #- $SSH_EC2 'sudo docker pull $CI_REGISTRY_IMAGE/'
+    #- $SSH_EC2 'ls'
+    #- $SSH_EC2 'pwd'
+    #- $SSH_EC2 echo ${CI_REGISTRY_IMAGE}
+    #- $SSH_EC2 'CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}'
+    #- $SSH_EC2 'echo "$CI_REGISTRY_IMAGE"'
+    - $SSH_EC2 'sudo docker compose up'
+    - $SSH_EC2 'sudo docker compose restart'
+  environment:
+    name: dev
+    url: https://microservice-app.dev.com
